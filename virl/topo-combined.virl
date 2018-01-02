@@ -170,6 +170,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
+          <entry key="static_serial_port_0" type="Integer">19000</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.22" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.5" netPrefixLenV4="30"/>
@@ -331,6 +332,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
+          <entry key="static_serial_port_0" type="Integer">19001</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.10" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.14" netPrefixLenV4="30"/>
@@ -495,6 +497,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
+          <entry key="static_serial_port_0" type="Integer">19002</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.6" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.13" netPrefixLenV4="30"/>
@@ -654,6 +657,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
+          <entry key="static_serial_port_0" type="Integer">19003</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.18" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.9" netPrefixLenV4="30"/>
@@ -830,6 +834,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
+          <entry key="static_serial_port_0" type="Integer">19004</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.21" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.17" netPrefixLenV4="30"/>
@@ -971,6 +976,7 @@ no scheduler allocate
 ntp server pnpntpserver.ciscolive.local
 !
 end</entry>
+            <entry key="static_serial_port_0" type="Integer">19005</entry>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.5" netPrefixLenV4="30"/>
@@ -1129,6 +1135,7 @@ no scheduler allocate
 !
 end</entry>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="static_serial_port_0" type="Integer">19006</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.6" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.9" netPrefixLenV4="30"/>
@@ -1292,6 +1299,7 @@ no scheduler allocate
 !
 end</entry>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="static_serial_port_0" type="Integer">19007</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.10" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.5" netPrefixLenV4="30"/>
@@ -1427,6 +1435,7 @@ line vty 0 4
 !
 end</entry>
             <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="static_serial_port_0" type="Integer">19008</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
