@@ -2,6 +2,7 @@
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
     <extensions>
         <entry key="AutoNetkit.enable_cdp" type="Boolean">true</entry>
+        <entry key="lxc.host.static_ip" type="String">198.18.1.106</entry>
     </extensions>
     <node name="RtrA" type="SIMPLE" subtype="IOSv" location="133,189" vmImage="IOSv" vmFlavor="IOSv" ipv4="192.168.0.5">
         <extensions>
