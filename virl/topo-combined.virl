@@ -171,7 +171,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
-          <entry key="static_serial_port_0" type="Integer">19000</entry>
+            <entry key="static_serial_port_0" type="Integer">19000</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.22" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.5" netPrefixLenV4="30"/>
@@ -333,7 +333,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
-          <entry key="static_serial_port_0" type="Integer">19001</entry>
+            <entry key="static_serial_port_0" type="Integer">19001</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.10" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.14" netPrefixLenV4="30"/>
@@ -498,7 +498,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
-          <entry key="static_serial_port_0" type="Integer">19002</entry>
+            <entry key="static_serial_port_0" type="Integer">19002</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.6" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.13" netPrefixLenV4="30"/>
@@ -658,7 +658,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
-          <entry key="static_serial_port_0" type="Integer">19003</entry>
+            <entry key="static_serial_port_0" type="Integer">19003</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.18" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.9" netPrefixLenV4="30"/>
@@ -835,7 +835,7 @@ line vty 0 4
 no scheduler allocate
 !
 end</entry>
-          <entry key="static_serial_port_0" type="Integer">19004</entry>
+            <entry key="static_serial_port_0" type="Integer">19004</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1" ipv4="10.0.0.21" netPrefixLenV4="30"/>
         <interface id="1" name="GigabitEthernet0/2" ipv4="10.0.0.17" netPrefixLenV4="30"/>
@@ -1445,93 +1445,106 @@ end</entry>
     <node name="linux-host" type="SIMPLE" subtype="server" location="225,164">
         <extensions>
             <entry key="static_serial_port_0" type="Integer">19009</entry>
-            <entry key="config" type="String">#cloud-config
-bootcmd:
-- ln -s -t /etc/rc.d /etc/rc.local
-hostname:              linux-host
-manage_etc_hosts:      true
-runcmd:
-- start ttyS0
-- systemctl start getty@ttyS0.service
-- systemctl start rc-local
-- sed -i '/^\s*PasswordAuthentication\s\+no/d' /etc/ssh/sshd_config
-- echo "UseDNS no" &gt;&gt; /etc/ssh/sshd_config
-- service ssh restart
-- service sshd restart
-users:
-- default
-- gecos:               User configured by VIRL Configuration Engine 0.23.10
-  lock-passwd:         false
-  name:                cisco
-  plain-text-passwd:   cisco
-  shell:               /bin/bash
-  ssh-authorized-keys:
-  - VIRL-USER-SSH-PUBLIC-KEY
-  sudo:                ALL=(ALL) ALL
-write_files:
-- path:                /etc/init/ttyS0.conf
-  owner:               root:root
-  content:             |
-    # ttyS0 - getty
-    # This service maintains a getty on ttyS0 from the point the system is
-    # started until it is shut down again.
-    start on stopped rc or RUNLEVEL=[12345]
-    stop on runlevel [!12345]
-    respawn
-    exec /sbin/getty -L 115200 ttyS0 vt102
-  permissions:         '0644'
-- path:                /etc/systemd/system/dhclient@.service
-  content:             |
-    [Unit]
-    Description=Run dhclient on %i interface
-    After=network.target
-    [Service]
-    Type=oneshot
-    ExecStart=/sbin/dhclient %i -pf /var/run/dhclient.%i.pid -lf /var/lib/dhclient/dhclient.%i.lease
-    RemainAfterExit=yes
-  owner:               root:root
-  permissions:         '0644'
-- path:                /etc/dhcp/dhclient.conf
-  owner:               root:root
-  permisions:          '0644'
-  content:             |
-   option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
-   send host-name = gethostname();
-   request subnet-mask, broadcast-address, time-offset,
-   host-name, dhcp6.name-servers, dhcp6.domain-search, dhcp6.fqdn,
-   dhcp6.sntp-servers,
-   netbios-name-servers, netbios-scope, interface-mtu,
-   rfc3442-classless-static-routes, ntp-servers;
-   interface "eth1" {
-     also request routers, domain-name-servers, domain-name, domain-search;
-   }
-- path:                /etc/rc.local
-  owner:               root:root
-  permissions:         '0755'
-  content:             |-
-    #!/bin/sh
-    ifconfig eth1 up
-    route delete default
-    dhclient -nw eth1
-    systemctl start dhclient@eth1.service
-    exit 0
-</entry>
+            <entry key="config" type="String">#cloud-config&#xD;
+bootcmd:&#xD;
+- ln -s -t /etc/rc.d /etc/rc.local&#xD;
+hostname:              linux-host&#xD;
+manage_etc_hosts:      true&#xD;
+runcmd:&#xD;
+- start ttyS0&#xD;
+- systemctl start getty@ttyS0.service&#xD;
+- systemctl start rc-local&#xD;
+- sed -i '/^\s*PasswordAuthentication\s\+no/d' /etc/ssh/sshd_config&#xD;
+- echo "UseDNS no" &gt;&gt; /etc/ssh/sshd_config&#xD;
+- echo "PasswordAuthentication yes" &gt;&gt; /etc/ssh/sshd_config&#xD;
+- service ssh restart&#xD;
+- service sshd restart&#xD;
+users:&#xD;
+- default&#xD;
+- gecos:               User configured by VIRL Configuration Engine 0.23.10&#xD;
+  lock-passwd:         false&#xD;
+  name:                cisco&#xD;
+  plain-text-passwd:   cisco&#xD;
+  shell:               /bin/bash&#xD;
+  ssh-authorized-keys:&#xD;
+  - VIRL-USER-SSH-PUBLIC-KEY&#xD;
+  sudo:                ALL=(ALL) ALL&#xD;
+write_files:&#xD;
+- path:                /etc/init/ttyS0.conf&#xD;
+  owner:               root:root&#xD;
+  content:             |&#xD;
+    # ttyS0 - getty&#xD;
+    # This service maintains a getty on ttyS0 from the point the system is&#xD;
+    # started until it is shut down again.&#xD;
+    start on stopped rc or RUNLEVEL=[12345]&#xD;
+    stop on runlevel [!12345]&#xD;
+    respawn&#xD;
+    exec /sbin/getty -L 115200 ttyS0 vt102&#xD;
+  permissions:         '0644'&#xD;
+- path:                /etc/systemd/system/dhclient@.service&#xD;
+  content:             |&#xD;
+    [Unit]&#xD;
+    Description=Run dhclient on %i interface&#xD;
+    After=network.target&#xD;
+    [Service]&#xD;
+    Type=oneshot&#xD;
+    ExecStart=/sbin/dhclient %i -pf /var/run/dhclient.%i.pid -lf /var/lib/dhclient/dhclient.%i.lease&#xD;
+    RemainAfterExit=yes&#xD;
+  owner:               root:root&#xD;
+  permissions:         '0644'&#xD;
+- path:                /etc/dhcp/dhclient.conf&#xD;
+  owner:               root:root&#xD;
+  permissions:         '0644'&#xD;
+  content:             |&#xD;
+    option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;&#xD;
+    send host-name = gethostname();&#xD;
+    request subnet-mask, broadcast-address, time-offset,&#xD;
+    host-name, dhcp6.name-servers, dhcp6.domain-search, dhcp6.fqdn,&#xD;
+    dhcp6.sntp-servers,&#xD;
+    netbios-name-servers, netbios-scope, interface-mtu,&#xD;
+    rfc3442-classless-static-routes, ntp-servers;&#xD;
+    interface "eth1" {&#xD;
+      also request routers, domain-name-servers, domain-name, domain-search;&#xD;
+    }&#xD;
+- path:                /etc/first_boot.sh&#xD;
+  owner:               root:root&#xD;
+  permissions:         '0755'&#xD;
+  content:             |-&#xD;
+    #!/bin/sh&#xD;
+    apt-get update&#xD;
+    apt-get install -y vsftpd&#xD;
+    sed -i '/^#write_enable/s/^#//g' /etc/vsftpd.conf&#xD;
+    service vsftpd restart&#xD;
+    rm -f /etc/first_boot.sh&#xD;
+- path:                /etc/rc.local&#xD;
+  owner:               root:root&#xD;
+  permissions:         '0755'&#xD;
+  content:             |-&#xD;
+    #!/bin/sh&#xD;
+    ifconfig eth1 up&#xD;
+    route delete default&#xD;
+    dhclient -nw eth1&#xD;
+    systemctl start dhclient@eth1.service&#xD;
+    if [ -f /etc/first_boot.sh ]; then&#xD;
+      nohup /etc/first_boot.sh &gt; /tmp/first_boot.log 2&gt;&amp;1 &amp;&#xD;
+    fi&#xD;
+    exit 0</entry>
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
     <node name="dCloud" type="ASSET" subtype="FLAT" location="382,205">
-      <extensions>
-          <entry key="static_ip" type="String">198.18.1.107</entry>
-      </extensions>
+        <extensions>
+            <entry key="static_ip" type="String">198.18.1.107</entry>
+        </extensions>
         <interface id="0" name="link0"/>
     </node>
-    <connection dst="/virl:topology/virl:node[@name='RtrC']/virl:interface[1]" src="/virl:topology/virl:node[@name='RtrA']/virl:interface[2]"/>
-    <connection dst="/virl:topology/virl:node[@name='RtrD']/virl:interface[1]" src="/virl:topology/virl:node[@name='RtrB']/virl:interface[2]"/>
-    <connection dst="/virl:topology/virl:node[@name='RtrD']/virl:interface[2]" src="/virl:topology/virl:node[@name='RtrC']/virl:interface[2]"/>
-    <connection dst="/virl:topology/virl:node[@name='Pagent']/virl:interface[1]" src="/virl:topology/virl:node[@name='RtrA']/virl:interface[1]"/>
-    <connection dst="/virl:topology/virl:node[@name='RtrB']/virl:interface[1]" src="/virl:topology/virl:node[@name='Pagent']/virl:interface[2]"/>
-    <connection dst="/virl:topology/virl:node[@name='dhcp-relay']/virl:interface[1]" src="/virl:topology/virl:node[@name='dhcp-client']/virl:interface[1]"/>
-    <connection dst="/virl:topology/virl:node[@name='dhcp-server']/virl:interface[1]" src="/virl:topology/virl:node[@name='dhcp-relay']/virl:interface[2]"/>
-    <connection dst="/virl:topology/virl:node[@name='dhcp-server']/virl:interface[2]" src="/virl:topology/virl:node[@name='cdp-sw']/virl:interface[1]"/>
-    <connection dst="/virl:topology/virl:node[@name='linux-host']/virl:interface[1]" src="/virl:topology/virl:node[@name='dCloud']/virl:interface[1]"/>
-    </topology>
+    <connection dst="/virl:topology/virl:node[3]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[2]/virl:interface[1]" src="/virl:topology/virl:node[4]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[2]/virl:interface[2]" src="/virl:topology/virl:node[3]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[5]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[4]/virl:interface[1]" src="/virl:topology/virl:node[5]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[7]/virl:interface[1]" src="/virl:topology/virl:node[6]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[1]" src="/virl:topology/virl:node[7]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[2]" src="/virl:topology/virl:node[9]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[10]/virl:interface[1]" src="/virl:topology/virl:node[11]/virl:interface[1]"/>
+</topology>
