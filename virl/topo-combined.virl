@@ -1512,6 +1512,8 @@ write_files:&#xD;
   content:             |-&#xD;
     #!/bin/sh&#xD;
     apt-get update&#xD;
+    sleep 1&#xD;
+    apt-get update&#xD;
     apt-get install -y vsftpd&#xD;
     sed -i '/^#write_enable/s/^#//g' /etc/vsftpd.conf&#xD;
     service vsftpd restart&#xD;
