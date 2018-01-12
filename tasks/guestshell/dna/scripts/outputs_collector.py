@@ -24,10 +24,11 @@
 #
 # TECHNICAL ASSISTANCE CENTER (TAC) SUPPORT IS NOT AVAILABLE FOR THIS SCRIPT.
 #
-# Always check for the latest Version of this script via http://cs.co/NWPLab
 # ############################################################################
 
 import argparse
+import os
+from datetime import datetime
 
 import dna
 
@@ -39,24 +40,55 @@ def parse_arguments():
 
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--commands', help='The list of commands separated by "; ". '
-                                                 'The list should be limited by double quotes')
-    parser.add_argument('-H', '--hostname', help='Hostname of FTP server')
+    parser.add_argument('-c', '--commands', required=True,
+                        help='The list of commands separated by "; ". '
+                              'The list should be limited by double quotes')
+    parser.add_argument('-H', '--host', help='IP or domain name of FTP server')
     parser.add_argument('-u', '--username', help='username for FTP server')
     parser.add_argument('-p', '--password', help='password for FTP server')
-    parser.add_argument('-s', '--spark-room-id', help='ID of the Spark room where notifications are posted')
+    parser.add_argument('-s', '--spark-room-id', help='Spark ROOM ID')
     # Hidden parameters
     parser.add_argument('-d', '--test-dir', help=argparse.SUPPRESS)
     args = parser.parse_args()
     return args
 
 
-def collect_outputs():
-    args = parse_arguments()
+def collect_outputs(commands):
+    result = []
+    for command in commands.split(';'):
+        command = command.strip()
+        result.append('\n\n----- command executed from guestshell: #{} -----\n\n{}'.format(
+            command, dna.get_output(command)
+        ))
+    return ''.join(result)
+
+
+def write_outputs_to_file(result):
+    if dna.is_debug_environment():
+        dir_name = os.path.dirname(os.path.dirname(os.getcwd()))
+        dir_name = os.path.join(dir_name, 'tests/files/tmp')
+    else:
+        dir_name = '/bootflash'
+
+    filename = '{}_outputs.txt'.format(datetime.now().strftime('%Y%m%d-%H%M%S'))
+    full_path = os.path.join(dir_name, filename)
+
+    with open(full_path, 'w') as f:
+        f.write(result)
+
+    print('Successfully written file {}'.format(full_path))
+    return full_path
 
 
 def main():
-    collect_outputs()
+    args = parse_arguments()
+    result = collect_outputs(args.commands)
+    full_path = write_outputs_to_file(result)
+    dst_file_path = os.path.join('outputs', os.path.basename(full_path))
+    dna.upload_file_to_ftp(src_file_path=full_path, dst_file_path=dst_file_path,
+                           host=args.host, username=args.username, password=args.password)
+    dna.send_spark_message(markdown='The file containing outputs `{}` has been uploaded to FTP {}'
+                                    ' and is available here: `{}`'.format(args.commands, args.host, dst_file_path))
 
 
 if __name__ == '__main__':
