@@ -39,25 +39,36 @@ ACL_CONFIG = '''
   <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
     <ip>
       <access-list>
-        <ios-acl:standard xmlns:ios-acl="http://cisco.com/ns/yang/Cisco-IOS-XE-acl">
+        <ios-acl:extended xmlns:ios-acl="http://cisco.com/ns/yang/Cisco-IOS-XE-acl">
           <ios-acl:name>WIN_ONLY</ios-acl:name>
           <ios-acl:access-list-seq-rule>
             <ios-acl:sequence>10</ios-acl:sequence>
-            <ios-acl:permit>
-              <ios-acl:std-ace>
+              <ios-acl:ace-rule>
+                <ios-acl:action>permit</ios-acl:action>
+                <ios-acl:protocol>icmp</ios-acl:protocol>
                 <ios-acl:host>198.18.133.36</ios-acl:host>
-              </ios-acl:std-ace>
-            </ios-acl:permit>
+                <ios-acl:dst-host>{}</ios-acl:dst-host>
+            </ios-acl:ace-rule>
           </ios-acl:access-list-seq-rule>
           <ios-acl:access-list-seq-rule>
             <ios-acl:sequence>20</ios-acl:sequence>
-            <ios-acl:deny>
-              <ios-acl:std-ace>
+              <ios-acl:ace-rule>
+                <ios-acl:action>deny</ios-acl:action>
+                <ios-acl:protocol>icmp</ios-acl:protocol>
                 <ios-acl:any/>
-              </ios-acl:std-ace>
-            </ios-acl:deny>
+                <ios-acl:dst-host>{}</ios-acl:dst-host>
+            </ios-acl:ace-rule>
           </ios-acl:access-list-seq-rule>
-        </ios-acl:standard>
+          <ios-acl:access-list-seq-rule>
+            <ios-acl:sequence>30</ios-acl:sequence>
+              <ios-acl:ace-rule>
+                <ios-acl:action>permit</ios-acl:action>
+                <ios-acl:protocol>ip</ios-acl:protocol>
+                <ios-acl:any/>
+                <ios-acl:dst-any/>
+            </ios-acl:ace-rule>
+          </ios-acl:access-list-seq-rule>
+        </ios-acl:extended>
       </access-list>
     </ip>
     <interface>
@@ -77,7 +88,7 @@ ACL_CONFIG = '''
     </interface>
   </native>
 </config>
-'''
+'''.format(constants.CSR_HOST, constants.CSR_HOST)
 
 
 def configure_acl():
