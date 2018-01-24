@@ -25,9 +25,16 @@
 # SUCH DAMAGE.
 #
 
-from ncclient import manager
+# sys.path hack
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-acl_cfg = '''
+from ncclient.manager import connect  # noqa
+
+from tasks import constants  # noqa
+
+ACL_CONFIG = '''
 <config>
   <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
     <ip>
@@ -55,7 +62,7 @@ acl_cfg = '''
     </ip>
     <interface>
       <GigabitEthernet>
-        <name>2</name>
+        <name>1</name>
         <ip>
           <access-group>
             <in>
@@ -72,9 +79,26 @@ acl_cfg = '''
 </config>
 '''
 
-with manager.connect_ssh(host='198.18.133.212', port=830, username='admin', hostkey_verify=False, password='C1sco12345') as m:
-    try:
-        m.edit_config(target='running', config=acl_cfg)
-        print('Successfully configured ACL on {}'.format(RTR_IP))
-    except Exception as e:
-        print('Failed to configre ACL: {}'.format(e))
+
+def configure_acl():
+    connection_params = {
+        'host': constants.CSR_HOST,
+        'username': constants.CSR_USERNAME,
+        'password': constants.CSR_PASSWORD,
+        'hostkey_verify': False,
+        'device_params': {'name': 'csr'}
+    }
+    with connect(**connection_params) as m:
+        try:
+            m.edit_config(target='running', config=ACL_CONFIG)
+            print('Successfully configured ACL on {}'.format(constants.CSR_HOST))
+        except Exception as e:
+            print('Failed to configure ACL: {}'.format(e))
+
+
+def main():
+    configure_acl()
+
+
+if __name__ == '__main__':
+    main()
