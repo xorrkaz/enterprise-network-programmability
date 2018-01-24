@@ -27,6 +27,7 @@ setup(
         'console_scripts': [
             'outputs_collector = dna.scripts.outputs_collector:main',
             'config_diff_to_spark = dna.scripts.config_diff:main',
+            'record_commands = dna.scripts.record_commands:main',
         ],
     },
     cmdclass={
