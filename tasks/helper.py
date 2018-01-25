@@ -31,11 +31,14 @@ import os
 import requests
 
 import env
+import constants
 
 SPARK_API_ROOT = 'https://api.ciscospark.com/v1'
 SPARK_API_MESSAGES_ENDPOINT = '/messages'
 SPARK_API_ROOMS_ENDPOINT = '/rooms'
 SPARK_ROOM_ID_FILENAME = 'SPARK_ROOM_ID.txt'
+
+RESTCONF_CHECK_ENDPOINT = 'https://{}/.well-known/host-meta'.format(constants.CSR_HOST)
 
 
 class SparkRoomNotFound(Exception):
@@ -43,6 +46,10 @@ class SparkRoomNotFound(Exception):
 
 
 class SparkAPIKeyNotFound(Exception):
+    pass
+
+
+class RESTCONFNotRunning(Exception):
     pass
 
 
@@ -153,7 +160,25 @@ def send_spark_message(markdown=None, message=None, room_id=None, api_token=None
                 'roomId': room_id}
 
     response = requests.post(SPARK_API_ROOT + SPARK_API_MESSAGES_ENDPOINT,
-                      headers=headers, json=data)
+                             headers=headers, json=data)
 
     response.raise_for_status()
     print('Spark message has been successfully sent.')
+
+
+def check_restconf():
+    """Checks if RESTCONF is operational by querying /.well-known/host-meta per RFC.
+
+    Returns:
+        None
+
+    Raises:
+        RESTCONFNotRunning exception if RESTCONF service is not operational
+    """
+    try:
+        response = requests.get(RESTCONF_CHECK_ENDPOINT, verify=False,
+                                auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD))
+        response.raise_for_status()
+    except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
+        raise RESTCONFNotRunning('Operation is unsuccessful. '
+                                 'Verify that RESTCONF and HTTPS server are enabled.')

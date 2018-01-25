@@ -34,37 +34,52 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tasks import constants  # noqa
+from tasks import constants, helper  # noqa
 
-STANDARD_ACL_ENDPOINT = '/data/native/ip/access-list/standard'
+EXTENDED_ACL_ENDPOINT = '/data/native/ip/access-list/extended'
 INTERFACE_ENDPOINT = '/data/native/interface/'
 INTERFACE_ACL_ENDPOINT = '/data/native/interface/{interface_type}={interface_number}/ip/access-group/{direction}/acl'
 
 INTERFACE_TO_APPLY = 'GigabitEthernet1'
 ACL_DIRECTION = 'in'
-STANDARD_ACL_NAME = 'WIN_ONLY'
+EXTENDED_ACL_NAME = 'WIN_ONLY'
 
 ACL_JSON = {
-    "standard": [
+    "extended": [
         {
             "name": "WIN_ONLY",
             "access-list-seq-rule": [
                 {
                     "sequence": 10,
-                    "permit": {
-                        "std-ace": {
-                            "host": "198.18.133.36"
-                        }
+                    "ace-rule": {
+                        "action": "permit",
+                        "protocol": "icmp",
+                        "host": "198.18.133.36",
+                        "dst-host": constants.CSR_HOST
                     }
                 },
                 {
                     "sequence": 20,
-                    "deny": {
-                        "std-ace": {
-                            "any": [
-                                None
-                            ]
-                        }
+                    "ace-rule": {
+                        "action": "deny",
+                        "protocol": "icmp",
+                        "any": [
+                            None
+                        ],
+                        "dst-host": constants.CSR_HOST
+                    }
+                },
+                {
+                    "sequence": 30,
+                    "ace-rule": {
+                        "action": "permit",
+                        "protocol": "ip",
+                        "any": [
+                            None
+                        ],
+                        "dst-any": [
+                            None
+                        ]
                     }
                 }
             ]
@@ -76,30 +91,30 @@ ACL_JSON = {
 INTERFACE_NAME_RE = re.compile(r'(?P<interface_type>[a-zA-Z\-]+)(?P<interface_number>[\d/.]+)')
 
 
-def remove_acl_if_exists(standard_acl_name):
+def remove_acl_if_exists(extended_acl_name):
     """Checks if ACL with the specified name already exists and removes it
 
     Args:
-        standard_acl_name (str): name of the ACL to check
+        extended_acl_name (str): name of the ACL to check
 
     Returns:
         None
     """
     # Check if ACL exists
-    # GET https://198.18.133.212/restconf/data/native/ip/access-list/standard=WIN_ONLY
+    # GET https://198.18.133.212/restconf/data/native/ip/access-list/extended=WIN_ONLY
     response = requests.get(
-        '{}{}={}'.format(constants.RESTCONF_ROOT, STANDARD_ACL_ENDPOINT, standard_acl_name),
+        '{}{}={}'.format(constants.RESTCONF_ROOT, EXTENDED_ACL_ENDPOINT, extended_acl_name),
         headers=constants.RESTCONF_HEADERS, auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD), verify=False
     )
 
     if response.ok:
-        print('Standard ACL {} already exists, removing'.format(standard_acl_name))
+        print('Extended ACL {} already exists, removing'.format(extended_acl_name))
         response = requests.delete(
-            '{}{}={}'.format(constants.RESTCONF_ROOT, STANDARD_ACL_ENDPOINT, standard_acl_name),
+            '{}{}={}'.format(constants.RESTCONF_ROOT, EXTENDED_ACL_ENDPOINT, extended_acl_name),
             headers=constants.RESTCONF_HEADERS, auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD), verify=False
         )
         if response.ok:
-            print('Standard ACL {} was successfully deleted'.format(standard_acl_name))
+            print('Extended ACL {} was successfully deleted'.format(extended_acl_name))
         else:
             print('Unexpected: status code is {} instead of 204 - no content'.format(response.status_code))
 
@@ -149,17 +164,17 @@ def configure_acl(acl):
     Returns:
         None
     """
-    # PUT https://198.18.133.212/restconf/data/native/ip/access-list/standard=WIN_ONLY
-    standard_acl_name = acl['standard'][0]['name']
+    # PUT https://198.18.133.212/restconf/data/native/ip/access-list/extended=WIN_ONLY
+    extended_acl_name = acl['extended'][0]['name']
 
     response = requests.put(
-        '{}{}={}'.format(constants.RESTCONF_ROOT, STANDARD_ACL_ENDPOINT, standard_acl_name),
+        '{}{}={}'.format(constants.RESTCONF_ROOT, EXTENDED_ACL_ENDPOINT, extended_acl_name),
         json=acl, headers=constants.RESTCONF_HEADERS,
         auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD), verify=False
     )
 
     if response.ok:
-        print('Successfully configured standard ACL {}'.format(standard_acl_name))
+        print('Successfully configured extended ACL {}'.format(extended_acl_name))
     else:
         print('Unexpected: status code is {} instead of 204 - no content'.format(response.status_code))
 
@@ -205,7 +220,10 @@ def main():
     # Disable warnings for self-signed certificate
     requests.packages.urllib3.disable_warnings()
 
-    acl_name = ACL_JSON['standard'][0]['name']
+    # Check that RESTCONF service is running
+    helper.check_restconf()
+
+    acl_name = ACL_JSON['extended'][0]['name']
 
     remove_acl_if_exists(acl_name)
     remove_acl_from_interface(INTERFACE_TO_APPLY, ACL_DIRECTION)

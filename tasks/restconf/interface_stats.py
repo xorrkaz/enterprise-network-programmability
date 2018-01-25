@@ -88,6 +88,9 @@ def main():
     # Disable warnings for self-signed certificate
     requests.packages.urllib3.disable_warnings()
 
+    # Check that RESTCONF service is running
+    helper.check_restconf()
+
     hostname = get_hostname()
     get_interface_statistics(INTERFACE_NAME, hostname)
 

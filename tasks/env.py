@@ -1,3 +1,5 @@
+## DO NOT modify this file. Use _LabEnv.py
+
 # Replace YOUR-NAME-HERE in the line below
 LAB_USER = 'YOUR-NAME-HERE'
 
@@ -10,3 +12,12 @@ LAB_USER_SPARK_TOKEN = 'YOUR-ACCESS-TOKEN-HERE'
 LAB_SESSION = 'dCloud DNA Network Programmability Lab v1.4'
 
 SPARK_ROOM_NAME = 'CLEU18 TECSDN-3602 Lab'
+
+
+# temporary change for backwards compatibility
+
+import os  # noqa
+if os.path.isfile('_LabEnv.py'):
+    import _LabEnv
+    LAB_USER = _LabEnv.LAB_USER
+    LAB_USER_SPARK_TOKEN = _LabEnv.LAB_USER_SPARK_TOKEN
