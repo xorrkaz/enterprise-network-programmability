@@ -29,57 +29,55 @@
 # 
 # ############################################################################
 import _LabEnv
-import json
 import requests
 import sys
 # Disable Certificate warning
-try:
-  requests.packages.urllib3.disable_warnings()
-except:
-  pass
+requests.packages.urllib3.disable_warnings()
+
 
 # ############################################################################
 # Variables below
 # ############################################################################
 SPARK_ROOM_ID = None
+CHECK_MARK_SYMBOL = '\u2705'
+CROSS_MARK_SYMBOL = '\u274C'
+APIC_EM_AUTH_ENDPOINT = '/ticket'
 
 # ############################################################################
 # Find (or Create) Spark Room
 # ############################################################################
-r = requests.get(_LabEnv.SPARK_API_ROOMS, headers=_LabEnv.SPARK_HEADERS, verify=False)
-j = json.loads(r.text)
+response = requests.get(_LabEnv.SPARK_API_ROOMS, headers=_LabEnv.SPARK_HEADERS, verify=False)
 
-for tmproom in j['items']:
-  if tmproom['title'] == _LabEnv.SPARK_ROOM_NAME:
-    SPARK_ROOM_ID = tmproom['id']
-    print("Found room ID for '" + _LabEnv.SPARK_ROOM_NAME + "' : " + SPARK_ROOM_ID)
-    break
+for tmproom in response.json()['items']:
+    if tmproom['title'] == _LabEnv.SPARK_ROOM_NAME:
+        SPARK_ROOM_ID = tmproom['id']
+        print("Found room ID for '{}' : {}".format(_LabEnv.SPARK_ROOM_NAME, SPARK_ROOM_ID))
+        break
     
 if SPARK_ROOM_ID is None:
-  print("Failed to find room ID for '" + _LabEnv.SPARK_ROOM_NAME + " creating it ...'")
-  t = json.dumps({'title':_LabEnv.SPARK_ROOM_NAME})
-  # print('Spark Request: ' + t)
-  r = requests.post(_LabEnv.SPARK_API_ROOMS, data=t, headers=_LabEnv.SPARK_HEADERS, verify=False)
-  # print('Spark Response: ' + r.text)
-  j = json.loads(r.text)  
-  SPARK_ROOM_ID = j['id']
+    print("Failed to find room ID for '{}' creating it ...".format(_LabEnv.SPARK_ROOM_NAME))
+    print("It seems that you are not in the joint spark room when the script was run"
+          "please let the proctor know")
+    data = {'title': _LabEnv.SPARK_ROOM_NAME}
+    # print('Spark Request: ' + t)
+    response = requests.post(_LabEnv.SPARK_API_ROOMS, json=data,
+                             headers=_LabEnv.SPARK_HEADERS, verify=False)
+    # print('Spark Response: ' + r.text)
+    SPARK_ROOM_ID = response.json()['id']
 
 if SPARK_ROOM_ID is None:
-  print("Failed to find or create room ID for '" + _LabEnv.SPARK_ROOM_NAME + "'")
-  sys.exit(1)
+    print("Failed to find or create room ID for '" + _LabEnv.SPARK_ROOM_NAME + "'")
+    sys.exit(1)
 
 # ############################################################################
 # Verify Lab Environment
 # ############################################################################
 
-ucgood = '\u2705' 
-ucbad =  '\u274C'
-
 # Python Version and Platform info
-labstate = ucgood + ' Python ('+sys.version+' on '+sys.platform+')\n'
+lab_state = '{} Python ({} on {})\n'.format(CHECK_MARK_SYMBOL, sys.version, sys.platform)
 
 # Spark Room info
-labstate = labstate + ucgood + ' Spark Room (ID='+SPARK_ROOM_ID+')\n'
+lab_state += '{} Sparm Room (ID={})\n'.format(CHECK_MARK_SYMBOL, SPARK_ROOM_ID)
 
 # dCloud Session info
 # TBD once session.xml is provisioned
@@ -87,19 +85,32 @@ dCloudSession = '000000'
 dCloudDC = 'N/A'
 dCloudPOD = 'POD %s (%s)' % (dCloudSession, dCloudDC)  
 
+
 # APIC-EM info
-apic_credentials = json.dumps({'username':_LabEnv.APIC_EM_USR,'password':_LabEnv.APIC_EM_PWD})
-tmp_headers = {'Content-type': 'application/json'}
-tmp_post = '%s/ticket' % _LabEnv.APIC_EM_API
-r = requests.post(tmp_post, data=apic_credentials, verify=False, headers=tmp_headers)
-labstate = labstate + ucgood + ' APIC-EM Login '+ str(r.json()['response']) +')\n'
+def form_apic_em_status_spark_message():
+    headers = {'Content-type': 'application/json'}
+    data = {'username': _LabEnv.APIC_EM_USR,
+            'password': _LabEnv.APIC_EM_PWD}
+    try:
+        response = requests.post(_LabEnv.APIC_EM_API + APIC_EM_AUTH_ENDPOINT, json=data,
+                                 headers=headers, verify=False)
+        response.raise_for_status()
+        spark_message = '{} APIC-EM Login {}\n'.format(CHECK_MARK_SYMBOL, response.json()['response'])
+    except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
+        spark_message = '{} Connection to APIC-EM server {} was unsuccessful\n'.format(
+            CROSS_MARK_SYMBOL, _LabEnv.APIC_EM_HOST
+        )
+    return spark_message
+
+
+lab_state += form_apic_em_status_spark_message()
 
 # ############################################################################
 # Post into Spark Room
 # ############################################################################
 # messagetext = 'Hello %s this is %s on %s\n%s' % (_LabEnv.LAB_SESSION, _LabEnv.LAB_USER, dCloudPOD, labstate)
-messagetext = 'Hello %s this is %s \n%s' % (_LabEnv.LAB_SESSION, _LabEnv.LAB_USER, labstate)
-r = _LabEnv.postSparkMessage(messagetext)
+spark_message = 'Hello {} this is {} \n{}'.format(_LabEnv.LAB_SESSION, _LabEnv.LAB_USER, lab_state)
+r = _LabEnv.postSparkMessage(spark_message)
 
 # ############################################################################
 # EOF
