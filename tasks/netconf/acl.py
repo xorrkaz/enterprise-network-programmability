@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2017  Joe Clarke <jclarke@cisco.com>
+# Copyright (c) 2017-2018  Joe Clarke <jclarke@cisco.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ ACL_CONFIG = '''
               <ios-acl:ace-rule>
                 <ios-acl:action>permit</ios-acl:action>
                 <ios-acl:protocol>icmp</ios-acl:protocol>
-                <ios-acl:host>198.18.133.36</ios-acl:host>
+                <ios-acl:host>{}</ios-acl:host>
                 <ios-acl:dst-host>{}</ios-acl:dst-host>
             </ios-acl:ace-rule>
           </ios-acl:access-list-seq-rule>
@@ -88,7 +88,7 @@ ACL_CONFIG = '''
     </interface>
   </native>
 </config>
-'''.format(constants.CSR_HOST, constants.CSR_HOST)
+'''.format(constants.WINDOWS_WORKSTATION, constants.CSR_HOST, constants.CSR_HOST)
 
 
 def configure_acl():
