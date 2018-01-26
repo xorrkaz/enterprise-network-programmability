@@ -54,7 +54,7 @@ ACL_JSON = {
                     "ace-rule": {
                         "action": "permit",
                         "protocol": "icmp",
-                        "host": "198.18.133.36",
+                        "host": constants.WINDOWS_WORKSTATION,
                         "dst-host": constants.CSR_HOST
                     }
                 },
