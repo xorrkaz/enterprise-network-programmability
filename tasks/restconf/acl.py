@@ -42,19 +42,19 @@ INTERFACE_ACL_ENDPOINT = '/data/native/interface/{interface_type}={interface_num
 
 INTERFACE_TO_APPLY = 'GigabitEthernet1'
 ACL_DIRECTION = 'in'
-EXTENDED_ACL_NAME = 'WIN_ONLY'
+EXTENDED_ACL_NAME = 'LINUX_ONLY'
 
 ACL_JSON = {
     "extended": [
         {
-            "name": "WIN_ONLY",
+            "name": EXTENDED_ACL_NAME,
             "access-list-seq-rule": [
                 {
                     "sequence": 10,
                     "ace-rule": {
                         "action": "permit",
                         "protocol": "icmp",
-                        "host": constants.WINDOWS_WORKSTATION,
+                        "host": constants.LINUX_HOST,
                         "dst-host": constants.CSR_HOST
                     }
                 },
@@ -101,7 +101,7 @@ def remove_acl_if_exists(extended_acl_name):
         None
     """
     # Check if ACL exists
-    # GET https://198.18.133.212/restconf/data/native/ip/access-list/extended=WIN_ONLY
+    # GET https://198.18.133.212/restconf/data/native/ip/access-list/extended=LINUX_ONLY
     response = requests.get(
         '{}{}={}'.format(constants.RESTCONF_ROOT, EXTENDED_ACL_ENDPOINT, extended_acl_name),
         headers=constants.RESTCONF_HEADERS, auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD), verify=False
@@ -164,7 +164,7 @@ def configure_acl(acl):
     Returns:
         None
     """
-    # PUT https://198.18.133.212/restconf/data/native/ip/access-list/extended=WIN_ONLY
+    # PUT https://198.18.133.212/restconf/data/native/ip/access-list/extended=LINUX_ONLY
     extended_acl_name = acl['extended'][0]['name']
 
     response = requests.put(
