@@ -36,6 +36,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from tasks import constants, helper  # noqa
 
+
 EXTENDED_ACL_ENDPOINT = '/data/native/ip/access-list/extended'
 INTERFACE_ENDPOINT = '/data/native/interface/'
 INTERFACE_ACL_ENDPOINT = '/data/native/interface/{interface_type}={interface_number}/ip/access-group/{direction}/acl'
@@ -45,46 +46,44 @@ ACL_DIRECTION = 'in'
 EXTENDED_ACL_NAME = 'LINUX_ONLY'
 
 ACL_JSON = {
-    "extended": [
-        {
-            "name": EXTENDED_ACL_NAME,
-            "access-list-seq-rule": [
-                {
-                    "sequence": 10,
-                    "ace-rule": {
-                        "action": "permit",
-                        "protocol": "icmp",
-                        "host": constants.LINUX_HOST,
-                        "dst-host": constants.CSR_HOST
-                    }
-                },
-                {
-                    "sequence": 20,
-                    "ace-rule": {
-                        "action": "deny",
-                        "protocol": "icmp",
-                        "any": [
-                            None
-                        ],
-                        "dst-host": constants.CSR_HOST
-                    }
-                },
-                {
-                    "sequence": 30,
-                    "ace-rule": {
-                        "action": "permit",
-                        "protocol": "ip",
-                        "any": [
-                            None
-                        ],
-                        "dst-any": [
-                            None
-                        ]
-                    }
+    "extended": {
+        "name": EXTENDED_ACL_NAME,
+        "access-list-seq-rule": [
+            {
+                "sequence": 10,
+                "ace-rule": {
+                    "action": "permit",
+                    "protocol": "icmp",
+                    "host": constants.LINUX_HOST,
+                    "dst-host": constants.CSR_HOST
                 }
-            ]
-        }
-    ]
+            },
+            {
+                "sequence": 20,
+                "ace-rule": {
+                    "action": "deny",
+                    "protocol": "icmp",
+                    "any": [
+                        None
+                    ],
+                    "dst-host": constants.CSR_HOST
+                }
+            },
+            {
+                "sequence": 30,
+                "ace-rule": {
+                    "action": "permit",
+                    "protocol": "ip",
+                    "any": [
+                        None
+                    ],
+                    "dst-any": [
+                        None
+                    ]
+                }
+            }
+        ]
+    }
 }
 
 
@@ -165,7 +164,7 @@ def configure_acl(acl):
         None
     """
     # PUT https://198.18.133.212/restconf/data/native/ip/access-list/extended=LINUX_ONLY
-    extended_acl_name = acl['extended'][0]['name']
+    extended_acl_name = acl['extended']['name']
 
     response = requests.put(
         '{}{}={}'.format(constants.RESTCONF_ROOT, EXTENDED_ACL_ENDPOINT, extended_acl_name),
@@ -176,6 +175,7 @@ def configure_acl(acl):
     if response.ok:
         print('Successfully configured extended ACL {}'.format(extended_acl_name))
     else:
+        response.raise_for_status()
         print('Unexpected: status code is {} instead of 204 - no content'.format(response.status_code))
 
 
@@ -223,7 +223,7 @@ def main():
     # Check that RESTCONF service is running
     helper.check_restconf()
 
-    acl_name = ACL_JSON['extended'][0]['name']
+    acl_name = ACL_JSON['extended']['name']
 
     remove_acl_if_exists(acl_name)
     remove_acl_from_interface(INTERFACE_TO_APPLY, ACL_DIRECTION)
