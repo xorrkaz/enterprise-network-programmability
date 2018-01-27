@@ -27,11 +27,13 @@
 # ############################################################################
 
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import requests
+import requests  # noqa
 
-import env
-import constants
+import env  # noqa
+import constants  # noqa
 
 SPARK_API_ROOT = 'https://api.ciscospark.com/v1'
 SPARK_API_MESSAGES_ENDPOINT = '/messages'

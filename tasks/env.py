@@ -17,7 +17,7 @@ SPARK_ROOM_NAME = 'CLEU18 TECSDN-3602 Lab'
 # temporary change for backwards compatibility
 
 import os  # noqa
-if os.path.isfile('_LabEnv.py'):
+if os.path.isfile(os.path.join(os.path.dirname(__file__), '_LabEnv.py')):
     import _LabEnv
     LAB_USER = _LabEnv.LAB_USER
     LAB_USER_SPARK_TOKEN = _LabEnv.LAB_USER_SPARK_TOKEN
