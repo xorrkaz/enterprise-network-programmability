@@ -31,8 +31,9 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from ncclient.manager import connect  # noqa
+from ncclient.transport.errors import SSHError  # noqa
 
-from tasks import constants  # noqa
+from tasks import constants, helper  # noqa
 
 ACL_CONFIG = '''
 <config>
@@ -99,12 +100,16 @@ def configure_acl():
         'hostkey_verify': False,
         'device_params': {'name': 'csr'}
     }
-    with connect(**connection_params) as m:
-        try:
-            m.edit_config(target='running', config=ACL_CONFIG)
-            print('Successfully configured ACL on {}'.format(constants.CSR_HOST))
-        except Exception as e:
-            print('Failed to configure ACL: {}'.format(e))
+    try:
+        with connect(**connection_params) as m:
+            try:
+                m.edit_config(target='running', config=ACL_CONFIG)
+                print('Successfully configured ACL on {}'.format(constants.CSR_HOST))
+            except Exception as e:
+                print('Failed to configure ACL: {}'.format(e))
+    except SSHError:
+        raise helper.NETCONFNotRunning('Operation was NOT successful. '
+                                       'Verify that NETCONF is enabled')
 
 
 def main():

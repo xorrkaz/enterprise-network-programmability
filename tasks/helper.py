@@ -54,6 +54,9 @@ class SparkAPIKeyNotFound(Exception):
 class RESTCONFNotRunning(Exception):
     pass
 
+class NETCONFNotRunning(Exception):
+    pass
+
 
 def get_spark_api_token():
     """Looks for and returns the SPARK API token in environmental variables and env.py file.
@@ -182,5 +185,5 @@ def check_restconf():
                                 auth=(constants.CSR_USERNAME, constants.CSR_PASSWORD))
         response.raise_for_status()
     except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError):
-        raise RESTCONFNotRunning('Operation is unsuccessful. '
+        raise RESTCONFNotRunning('Operation was NOT successful. '
                                  'Verify that RESTCONF and HTTPS server are enabled.')
