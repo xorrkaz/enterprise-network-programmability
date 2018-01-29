@@ -107,3 +107,5 @@ venv.bak/
 .idea/
 SPARK_ROOM_ID.txt
 _LabEnv.py
+
+.DS_Store
