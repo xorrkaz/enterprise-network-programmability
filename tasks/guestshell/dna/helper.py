@@ -31,7 +31,7 @@ import ftplib
 import os
 from pkgutil import find_loader
 
-import requests
+from ciscosparkapi import CiscoSparkAPI
 
 SPARK_API_ROOT = 'https://api.ciscospark.com/v1'
 SPARK_API_MESSAGES_ENDPOINT = '/messages'
@@ -173,44 +173,37 @@ def upload_file_to_ftp(src_file_path, dst_file_path, host, username='anonymous',
     print('Successfully uploaded file {} to FTP {}'.format(dst_file_path, host))
 
 
-def send_spark_message(message=None, markdown=None, room_id=None, api_token=None):
-    """
+def send_spark_message(markdown=None, room_name=None, room_id=None, api_token=None):
+    """Send markdown message to Spark
 
     Args:
-        message:
-        markdown:
-        room_id:
-        api_token:
+        markdown (str): markdown text to send
+        room_name (str): Spark room name
+        room_id (str): Spark room ID
+        api_token (str): Spark access token
 
     Returns:
-
+        None
     """
-    if room_id is None:
-        room_id = os.environ.get('SPARK_ROOM_ID')
-        if room_id is None:
-            raise SparkRoomNotFound('Spark Room ID was not specified as a command line'
-                                    'argument or environmental variable')
-
+    api_token = api_token or os.environ.get('SPARK_API_TOKEN')
     if api_token is None:
-        api_token = os.environ.get('SPARK_API_TOKEN')
-        if api_token is None:
-            raise SparkAPIKeyNotFound('Spark API key was not specified as an environmental variable')
+        raise SparkAPIKeyNotFound('Spark API key was not specified as an environmental variable')
 
-    headers = {'Authorization': 'Bearer {}'.format(api_token),
-               'Content-Type': 'application/json'}
+    spark_api = CiscoSparkAPI(access_token=api_token)
 
-    if message is not None:
-        data = {'text': message,
-                'roomId': room_id}
-    else:
-        data = {'markdown': markdown,
-                'roomId': room_id}
+    room_name = room_name or os.environ.get('SPARK_ROOM_NAME')
+    room_id = room_id or os.environ.get('SPARK_ROOM_ID')
+    if room_name:
+        for room in spark_api.rooms.list():
+            if room.title == room_name:
+                room_id = room.id
+                break
+        else:
+            raise SparkRoomNotFound("Spark room {} was not found".format(room_name))
+    elif not room_id:
+        raise SparkRoomNotFound(
+            'Spark Room Name or ID was not specified as a command line'
+            'argument or environmental variable'
+        )
 
-    r = requests.post(SPARK_API_ROOT + SPARK_API_MESSAGES_ENDPOINT,
-                      headers=headers, json=data)
-
-    if r.status_code == 200:
-        print('Spark message has been posted.')
-    else:
-        r.raise_for_status()
-
+    spark_api.messages.create(roomId=room_id, markdown=markdown)

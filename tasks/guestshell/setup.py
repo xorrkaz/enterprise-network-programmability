@@ -14,7 +14,7 @@ class PostInstallCommand(install):
 
 setup(
     name='dna-scripts',
-    version='0.1',
+    version='0.2',
     packages=find_packages(),
     license='All rights reserved',
     long_description=open('README.md').read(),
@@ -22,6 +22,7 @@ setup(
     python_requires='==2.7.*',
     install_requires=[
         'requests',
+        'CiscoSparkAPI',
     ],
     entry_points={
         'console_scripts': [
