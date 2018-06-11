@@ -11,7 +11,7 @@ LAB_USER_SPARK_TOKEN = 'YOUR-ACCESS-TOKEN-HERE'
 
 LAB_SESSION = 'dCloud DNA Network Programmability Lab v1.4'
 
-SPARK_ROOM_NAME = 'CLEU18 TECSDN-3602 Lab'
+SPARK_ROOM_NAME = 'LTRNMS-3602: Enterprise SDN: Advanced Network Programming Hands-On Lab'
 
 
 # temporary change for backwards compatibility
